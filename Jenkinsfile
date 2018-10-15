@@ -12,12 +12,16 @@ pipeline {
         stage ('Initialize') {
             steps {
                 script{
-                    server = Artifactory.newServer url: 'http://localhost:8081/artifactory', username: 'admin', password: 'admin'
+                    //server = Artifactory.newServer url: 'http://localhost:8081/artifactory', username: 'admin', password: 'admin'
                     rtMaven = Artifactory.newMavenBuild()
-                    rtMaven.resolver server: server, releaseRepo: 'all-repo', snapshotRepo: 'all-repo'
-                    rtMaven.deployer server: server, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
-                    rtMaven.deployer.deployArtifacts = false
+                    rtMaven.resolver releaseRepo: 'all-repo', snapshotRepo: 'all-repo'
+                    rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
+                    //rtMaven.deployer.deployArtifacts = false
                     rtMaven.tool = 'maven-3.5.4'
+                    sh '''
+                        echo "PATH = ${PATH}"
+                        echo "M2_HOME = ${M2_HOME}"
+                    '''
                     
                 }
             }
@@ -37,15 +41,15 @@ pipeline {
                 }
             }
         }
-        stage('Publish'){
-            steps{
-                script{
-                    
-                    rtMaven.deployer.deployArtifacts buildInfo
-                    server.publishBuildInfo buildInfo
-
-                }
-            }
-        }
+       // stage('Publish'){
+       //     steps{
+       //         script{
+       //             
+       //             rtMaven.deployer.deployArtifacts buildInfo
+       //             server.publishBuildInfo buildInfo
+       //
+       //         }
+       //     }
+       // }
     }
 }
